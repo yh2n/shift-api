@@ -76,11 +76,12 @@ app.get('/api/protected', jwtAuth, (req, res) => {
 });
 
 
+mongoose.set('useCreateIndex',true);
 let server;
 
 function runServer(databaseUrl = DATABASE_URL, port = PORT) {
 	return new Promise((resolve, reject) => {
-		 mongoose.connect(databaseUrl, {useMongoClient: true}, err => {
+		 mongoose.connect(databaseUrl, {useNewUrlParser: true}, err => {
 			if(err) {
 				return reject(err);
 			}
