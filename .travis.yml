@@ -1,2 +1,11 @@
 language: node_js
 node_js: node
+services:
+- mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: iwxpxS+9EyaexO9sKVa10z1PUbo0htq4w9J4stCv9Lyrs5Lg6GxicJE+su1Jbu4i2nU++wdiWtTgHYj//eblu2VMcI4pkCN1h8sCJAsB7lr6qeGOXWhSPcFBDPNA7MHj0VXTl1U+C2dIQcnHSyr0B1c+e9fBMmi1a5bOMn3ebDX2nTiu7jYr8R9x12gZ678cVI4vA152wAM+lS7tzcFJtz8TJO0GBm+4jlMgBbiebJdPSjUFaXTB339HPd3rN9y+7bSSZ1tM+yEmOByDlx51BTgKqTxuWlQ7CmfjB/upbOhDGQZz0l9XAXiZRfOZ2vsaeZGtjCmrtPikHNcRfBpIpcX/kE4UJ4fBWcvOZQZaul8aVbls+8cAbcuQwhMff2+34OQLAgy2pcZmE4kKvpkryCx8Wlfti7Cb8HZNtqOU8dIcoW3opIsPl3YSE/XODVtmokU2sZQX2cuFLkIg6t740JzRCuX37IZPv3dLwGnHHHaaKSkOVGGPhRlb0PwtsPwsSPcgGVx3Y03qM1+PGD92u/bSGRIsdcG1A+LUdRYuT3u3dR9kasB0fR0hBBgQxpzTH6+OgCVx+1OWZIAIHs+WC3rL51IICwPTP9i++DuDnsIQelCY8BtCpoYWCHq93ETUrPXNSHqF3Te217dO6ZvR8Ij/4cDkePwisqRDmXc+l68=
+  app: shift-api
+  on:
+    repo: yh2n/shift-api 
