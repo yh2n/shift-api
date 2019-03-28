@@ -6,6 +6,6 @@ deploy:
   provider: heroku
   api_key:
     secure: KfVyyByI9yRR7bFIe5N1cjiA+9iEM9PSu71bUL5JIJoPxJPvNk5KXNoUW+gqjZ0zMNFD946dsx7jU0rCCK4IUKsVw4WwEj9Pji+5NWOMXy9y1M3vZ500OSqTcWuTYf2Xb3lWoRBqvAYNdwO7R/c7M3V+Waz8GLo2M115XxzRkfcAYfVRFPW1UxIvqtujLZSAFJtoepV7CGspaSFDhBqURztUlc/d2YBx58yWV/sqNuv+O8+i+qRIL6rkm9dqaozaBbEFMBxNBGST/UtSC6XV3Eo2rsJRDX8rHcDRKocx0cr8B0pVR8wPGJtnKrSW3vGZ+iaZYNKZH3+jFdz6ekmDbZL1qSLEqA4U0zO+Ommna5/7pXfPCkguwSa6EwobsF3q6WMeOHrotLtH9C8PzS/HZ8cFt2R9Y3coKfCrZgRPf1qFF4u3WEM0NWnCsuspSr+fqOZ2Lxsg30diGexQWuKNgqcSAatXruB+SW7lvArEFBHFTCbz45fhILeSfF7Odr1vJSf2bIQRcyvKYzE2vUPh2A12I48jdlujkYoTyCiqa5WeUlppztfPoMD2/JtJtBauAxEQIZUiP7jxd8cAh6vQVf/72fwl1AYYqjo4BnUXNQ/x4rbKKP8rCRC2wxzpw/p3XOJIZWyk+bUVldBIYuBbnlOAD6ch11oxz3vHtTwht0E=
-  app: shift-api
+  app: shift-server
   on:
     repo: yh2n/shift-api 
