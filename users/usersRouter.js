@@ -17,6 +17,15 @@ router.get('/employee_list', (req, res) => {
         .catch(err => res.status(500).json({ message: 'Internal server error' }));
 });
 
+router.get('/employee/:id', (req, res) => {
+    return User.findById(req.params.id)
+            .then(User => res.json(User.serialize()))
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({message: 'Internal server error'});
+            })
+});
+
 // get individual availability
 router.get('/:id/availability', (req, res) => {
     return User.findById(req.params.id)
@@ -29,10 +38,10 @@ router.get('/:id/availability', (req, res) => {
 
 // get indiviual current schedule
 router.get('/:id/schedule', (req, res) => {
-    return User.findById(req.params.id)
-    .then(User => res.json(User.schedule))
-    .catch(err => {
-        console.log(err);
+    return User.findOne({_id:req.params.id},{schedule: {$elemMatch:{week:2}}})
+        .then(schedule => res.json(schedule))
+        .catch(err => {
+        console.log(err);  
         res.status(500).json({message: 'Internal server error'});
     })
 });
