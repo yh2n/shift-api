@@ -10,7 +10,7 @@ const { User } = require('./models');
 
 // <--- GET --->
 
-// get all contacts
+// get all employees
 router.get('/employee_list', (req, res) => {
     return User.find()
         .then(users => res.json(users.map(user => user.serialize())))
@@ -39,7 +39,10 @@ router.get('/:id/availability', (req, res) => {
 // get indiviual current schedule
 router.get('/:id/schedule', (req, res) => {
     return User.findOne({_id:req.params.id},{schedule: {$elemMatch:{week:2}}})
-        .then(schedule => res.json(schedule))
+        .then(({schedule}) => {
+            res.json(schedule);
+            console.log(schedule)
+        })
         .catch(err => {
         console.log(err);  
         res.status(500).json({message: 'Internal server error'});
