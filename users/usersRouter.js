@@ -4,17 +4,27 @@ const router = express.Router();
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+const urlencodedParser = bodyParser.urlencoded({ extended: true })
 
 const cors = require('cors');
 const { User } = require('./models');
 
 // <--- GET --->
 
-// get all contacts
+// get all employees
 router.get('/employee_list', (req, res) => {
     return User.find()
         .then(users => res.json(users.map(user => user.serialize())))
         .catch(err => res.status(500).json({ message: 'Internal server error' }));
+});
+
+router.get('/employee/:id', (req, res) => {
+    return User.findById(req.params.id)
+            .then(User => res.json(User.serialize()))
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({message: 'Internal server error'});
+            })
 });
 
 // get individual availability
@@ -27,22 +37,14 @@ router.get('/:id/availability', (req, res) => {
             })
 });
 
-// get indiviual current schedule
-router.get('/:id/schedule', (req, res) => {
-    return User.findById(req.params.id)
-    .then(User => res.json(User.schedule))
-    .catch(err => {
-        console.log(err);
-        res.status(500).json({message: 'Internal server error'});
-    })
-});
-
-// get indiviual following schedule
-router.get('/:id/next_schedule', (req, res) => {
-    return User.findById(req.params.id)
-    .then(User => res.json(User.next_schedule))
-    .catch(err => {
-        console.log(err);
+// get indiviual schedule
+router.get('/:id/schedule/:week', (req, res) => {
+    let { id, week } = req.params;
+    return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
+    .then(({schedule}) => {
+        })
+        .catch(err => {
+        console.log(err);  
         res.status(500).json({message: 'Internal server error'});
     })
 });
@@ -204,7 +206,7 @@ router.put('/:id/availability', jsonParser,(req, res) => {
                 console.log(`updating user ${user.username}'s availability`);
                 user.availability = req.body;
                 user.save()
-                .then(() => {
+                .then(() => {$("<div class=\"animal-item\">")
                     return res.json(user.availability);
                     }
                 )
@@ -215,43 +217,46 @@ router.put('/:id/availability', jsonParser,(req, res) => {
             })
 });
 
-router.put('/:id/schedule', jsonParser,(req, res) => {
+router.put('/:id/schedule/:week', jsonParser, (req, res) => {
+    let { id, week } = req.params;
     console.log(req.params.id);
-    console.log(req.body);
-    return User.findById(req.params.id)
-            .then(user => { 
-                console.log(`updating ${user.username}'s current schedule`);
-                user.schedule = req.body;
-                user.save()
-                .then(() => {
-                    return res.json(user.schedule);
-                    }
-                )
-            })
-            .catch(err => {
-                console.error(err);
-                res.status(500).json({message: 'Internal server error'});
-            })
+    console.log(`Req.body: ${JSON.stringify(req.body)}`);
+    // let schedule = JSON.stringify(req.body);
+    let schedule = {Mo_breakfast: true};
+    return User.findOneAndUpdate({_id:id, schedule: {$elemMatch: {"week":14}}}, {$set:{"Mo_breakfast": true}}, {returnNewDocument: true})
+    .then(updatedDocument => {
+        if(updatedDocument) {
+          console.log(`Successfully updated document: ${updatedDocument}.`)
+        } else {
+          console.log("No document matches the provided query.")
+        }
+        return updatedDocument
+      })
+      .catch(err => console.error(`Failed to find and update document: ${err}`))
 });
 
-router.put('/:id/next_schedule', jsonParser,(req, res) => {
-    console.log(req.params.id);
-    console.log(req.body);
-    return User.findById(req.params.id)
-            .then(user => { 
-                console.log(`updating ${user.username}'s next week's schedule`);
-                user.next_schedule = req.body;
-                user.save()
-                .then(() => {
-                    return res.json(user.next_schedule);
-                    }
-                )
-            })
-            .catch(err => {
-                console.error(err);
-                res.status(500).json({message: 'Internal server error'});
-            })
-});
+// router.put('/:id/schedule/:week', jsonParser,(req, res) => {
+//     let { id, week } = req.params;
+//     console.log(req.params.id);
+//     console.log(`-----------------${req.body}`);
+//     return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
+//             .then(user => { 
+//                 // console.log(`updating ${user}'s schedule`);
+//                 user.schedule = JSON.stringify(req.body);
+//                 user.save()
+//                 .then(() => {
+//                     return res.json(user.schedule);
+//                     }
+//                 )
+//                 .catch(err => console.log(`!!!!!!!!!! ${err}`))
+//             })
+//             .catch(err => {
+//                 console.error(err);
+//                 res.status(500).json({message: 'Internal server error'});
+//             })
+// });
+
+
 
 router.patch('/:id/info', jsonParser,(req, res) => {
     console.log(req.params.id);

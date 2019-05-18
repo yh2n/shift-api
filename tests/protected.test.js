@@ -1,21 +1,23 @@
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const should = chai.should();
-const {app, runServer, closeServer} = require('../server');
-const {TEST_DATABASE_URL} = require('../config');
-const {User} = require('../users');
-const {JWT_SECRET} = require('../config');
+// const chai = require('chai');
+// const chaiHttp = require('chai-http');
+// const jwt = require('jsonwebtoken');
+// const {TEST_DATABASE_URL} = require('../config/keys');
 
-chai.use(chaiHttp);
+// const {app, runServer, closeServer} = require('../server');
+// const {User} = require('../users');
+// const {JWT_SECRET} = require('../config/keys');
 
-const expect = chai.expect;
+// const expect = chai.expect;
 
-// describe('Auth endpoints', function() {
+
+// chai.use(chaiHttp);
+
+// describe('Protected endpoint', function() {
 //     const username = 'exampleUser';
 //     const password = 'examplePass';
 //     const firstName = 'Example';
 //     const lastName = 'User';
-//     const emailAddress = "employee@test.com";
+//     const emailAddress = "test@employee.com";
 
 //     before(function() {
 //         return runServer(TEST_DATABASE_URL);
@@ -41,14 +43,12 @@ const expect = chai.expect;
 //         return User.remove({});
 //     });
 
-//     describe('/api/auth/login', function() {
+//     describe('/api/protected', function() {
 //         it('Should reject requests with no credentials', function() {
 //             return chai
 //                 .request(app)
-//                 .post('/api/auth/login')
-//                 .then(() =>
-//                     expect.fail(null, null, 'Request should not succeed')
-//                 )
+//                 .get('/api/protected')
+//                 .then(() => expect.fail(null, null, 'Request should not succeed'))
 //                 .catch(err => {
 //                     if (err instanceof chai.AssertionError) {
 //                         throw err;

@@ -6,7 +6,6 @@ const morgan = require('morgan');
 const passport =require('passport');
 const cors = require('cors');
 const app = express();
-const router = express.Router();
 const { PORT, DATABASE_URL, CLIENT_ORIGIN } = require('./config/keys');
 
 const mongoose = require('mongoose');
@@ -16,7 +15,7 @@ const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
 const { router: adminRouter } = require('./admin');
 
-// app.use(bodyParser.json());
+// app.use(bodyParser.json({type: 'application/*+json'}));
 // app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(morgan('common'));
@@ -76,11 +75,12 @@ app.get('/api/protected', jwtAuth, (req, res) => {
 });
 
 
+mongoose.set('useCreateIndex',true);
 let server;
 
 function runServer(databaseUrl = DATABASE_URL, port = PORT) {
 	return new Promise((resolve, reject) => {
-		 mongoose.connect(databaseUrl, {useMongoClient: true}, err => {
+		 mongoose.connect(databaseUrl, {useNewUrlParser: true}, err => {
 			if(err) {
 				return reject(err);
 			}
