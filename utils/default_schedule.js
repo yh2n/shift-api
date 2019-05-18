@@ -1,3 +1,4 @@
+// neees to be array of length 1 to match model and response expected server side
 const defaultSchedule = [{
     week: "",
     Mo_breakfast: false,
