@@ -15,8 +15,8 @@ const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
 const { router: adminRouter } = require('./admin');
 
-// app.use(bodyParser.json({type: 'application/*+json'}));
-// app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json({type: 'application/*+json'}));
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(morgan('common'));
 

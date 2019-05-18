@@ -5,6 +5,7 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: true })
+const { defaultSchedule } = require('../utils/default_schedule')
 
 const cors = require('cors');
 const { User } = require('./models');
@@ -37,19 +38,44 @@ router.get('/:id/availability', (req, res) => {
             })
 });
 
-// get indiviual schedule
+// get indiviual current schedule
 router.get('/:id/schedule/:week', (req, res) => {
     let { id, week } = req.params;
     return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
+    .then(({schedule}) => {
+        res.json(schedule);
+    })
+    .catch(err => {
+        console.log(err);  
+        res.status(500).json({message: 'Internal server error'});
+    })
+});
+
+// get indiviual selected schedule or return default schedule from ../utils/default_schedule if not found
+router.get('/:id/selected-schedule/:week', (req, res) => {
+    let { id, week } = req.params;
+    console.log(week)
+    return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
         .then(({schedule}) => {
+            if(schedule.length == 0) {
+                console.log("returning default schedule")
+                //res.json will return `defaultSchedule` with `week` set to `req.params`
+                defaultSchedule[0].week = week
+                res.json(defaultSchedule)
+            }
+            else {
             res.json(schedule);
-            console.log(schedule)
+            // console.log(schedule)
+            }
         })
         .catch(err => {
         console.log(err);  
         res.status(500).json({message: 'Internal server error'});
     })
 });
+
+
+
 
 // get indiviual address
 router.get('/:id/info', (req, res) => {
@@ -60,6 +86,7 @@ router.get('/:id/info', (req, res) => {
         res.status(500).json({message: 'Internal server error'});
     })
 });
+
 
 // <--- POST --->
 
@@ -98,10 +125,6 @@ router.post('/register', jsonParser, (req, res) => {
 
     console.log("break 2");
 
-    //   If username and password aren't trimmed we give an error.
-    // We need to reject such values explicitly and inform user.
-    // We'll silently trim the other fields, because they aren't credentials used
-    // to log in.
     const explicityTrimmedFields = ['username', 'password'];
     const nonTrimmedField = explicityTrimmedFields.find(
         field => req.body[field].trim() !== req.body[field]
@@ -198,7 +221,6 @@ router.post('/register', jsonParser, (req, res) => {
         })
 });
 
-
 // <--- PUT --->
 
 router.put('/:id/availability', jsonParser,(req, res) => {
@@ -219,54 +241,21 @@ router.put('/:id/availability', jsonParser,(req, res) => {
             })
 });
 
+
 router.put('/:id/schedule/:week', jsonParser, (req, res) => {
     let { id, week } = req.params;
-    console.log(req.params.id);
-    // console.log(`Req.body ${JSON.stringify(req.body)}`);
-    let schedule = JSON.stringify(req.body);
-    return User.findById(id)
-    .then(user => { 
-        console.log(`updating ${user.username}'s schedule`);
-                user.updateOne(
-                    {schedule: {$elemMatch: {week}}}, 
-                    {$set:{schedule}}, 
-                    {upsert:true}
-                    )
-                .then(() => {
-                    console.log(`***************** ${user.schedule}`)
-                    return res.json(user.schedule);
-                    }
-                )
-                .catch(err => console.log(err))
+    let schedule = req.body;
+    return User.update({_id: id, 'schedule.week': week}, 
+            {$set: {'schedule.$': schedule}})
+            .then(schedule => {
+                console.log(schedule)
+                return res.json(schedule)
             })
             .catch(err => {
                 console.error(err);
                 res.status(500).json({message: 'Internal server error'});
             })
-});
-
-// router.put('/:id/schedule/:week', jsonParser,(req, res) => {
-//     let { id, week } = req.params;
-//     console.log(req.params.id);
-//     console.log(`-----------------${req.body}`);
-//     return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
-//             .then(user => { 
-//                 // console.log(`updating ${user}'s schedule`);
-//                 user.schedule = JSON.stringify(req.body);
-//                 user.save()
-//                 .then(() => {
-//                     return res.json(user.schedule);
-//                     }
-//                 )
-//                 .catch(err => console.log(`!!!!!!!!!! ${err}`))
-//             })
-//             .catch(err => {
-//                 console.error(err);
-//                 res.status(500).json({message: 'Internal server error'});
-//             })
-// });
-
-
+})
 
 router.patch('/:id/info', jsonParser,(req, res) => {
     console.log(req.params.id);
@@ -327,3 +316,7 @@ router.patch('/:id/info', jsonParser,(req, res) => {
 
 
 module.exports = { router };
+
+
+// db.update({name: 'yoh', 'schedule.week': 2}, {$set: {'schedule.$': {mon: true}}})
+
