@@ -125,7 +125,7 @@ const UserSchema = mongoose.Schema({
         {
             week: {
                 type: Number,
-                default: 14
+                default: 1
             },
             Mo_breakfast: {
                 type: Boolean,
@@ -322,7 +322,7 @@ const UserSchema = mongoose.Schema({
             Su_can_cover: {
                 type: Boolean,
                 default: false
-            },
+            }
     }
 ],
         
@@ -348,10 +348,6 @@ const UserSchema = mongoose.Schema({
              default:''
          },
     },
-    date: {
-        type: String, //String and not Date in order to allow any formatting on the back end
-        default: moment().format('Do')
-    }
 });
 
 UserSchema.methods.serialize = function() {
