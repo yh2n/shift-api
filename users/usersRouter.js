@@ -74,9 +74,6 @@ router.get('/:id/selected-schedule/:week', (req, res) => {
     })
 });
 
-
-
-
 // get indiviual address
 router.get('/:id/info', (req, res) => {
     return User.findById(req.params.id)
@@ -230,7 +227,7 @@ router.put('/:id/availability', jsonParser,(req, res) => {
                 console.log(`updating user ${user.username}'s availability`);
                 user.availability = req.body;
                 user.save()
-                .then(() => {$("<div class=\"animal-item\">")
+                .then(() => {
                     return res.json(user.availability);
                     }
                 )
@@ -247,15 +244,29 @@ router.put('/:id/schedule/:week', jsonParser, (req, res) => {
     let schedule = req.body;
     return User.update({_id: id, 'schedule.week': week}, 
             {$set: {'schedule.$': schedule}})
-            .then(schedule => {
-                console.log(schedule)
-                return res.json(schedule)
+            // {writeConcern: schedule})
+            .then(scheduleFound => {
+                console.log(`%%%%%%%%%%%%%%%%${JSON.stringify(scheduleFound.n)}`)
+                return res.json(schedule)   
             })
             .catch(err => {
                 console.error(err);
                 res.status(500).json({message: 'Internal server error'});
             })
 })
+
+// router.put('/:id/schedule/:week', jsonParser, (req, res) => {
+//     let { id, week } = req.params;
+//     var requestedSchedule = User.findOne({_id:id}, {schedule: {$elemMatch: {week}}}).count()
+//     console.log(requestedSchedule)
+//     User.update({_id:id}, {schedule: {$elemMatch: {week}}})
+//         .then(({schedule}) => {
+//             console.log(`schedule found`)
+//         })
+//         .catch(err => console.log(err))
+
+// })
+
 
 router.patch('/:id/info', jsonParser,(req, res) => {
     console.log(req.params.id);
