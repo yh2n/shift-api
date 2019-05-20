@@ -24,7 +24,7 @@ router.get('/employee/:id', (req, res) => {
             .then(User => res.json(User.serialize()))
             .catch(err => {
                 console.log(err);
-                res.status(500).json({message: 'Internal server error'});
+                res.status(500).json({ message: 'Internal server error' });
             })
 });
 
@@ -41,13 +41,14 @@ router.get('/:id/availability', (req, res) => {
 // get indiviual current schedule
 router.get('/:id/schedule/:week', (req, res) => {
     let { id, week } = req.params;
-    return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
+    return User.findOne({ _id:id },{ schedule: { $elemMatch: { week } } } 
+    )
     .then(({schedule}) => {
         res.json(schedule);
     })
     .catch(err => {
         console.log(err);  
-        res.status(500).json({message: 'Internal server error'});
+        res.status(500).json({ message: 'Internal server error' });
     })
 });
 
@@ -55,7 +56,8 @@ router.get('/:id/schedule/:week', (req, res) => {
 router.get('/:id/selected-schedule/:week', (req, res) => {
     let { id, week } = req.params;
     console.log(week)
-    return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
+    return User.findOne({_id:id},{ schedule: { $elemMatch: { week } } } 
+        )
         .then(({schedule}) => {
             if(schedule.length == 0) {
                 console.log("returning default schedule")
@@ -234,7 +236,7 @@ router.put('/:id/availability', jsonParser,(req, res) => {
             })
             .catch(err => {
                 console.error(err);
-                res.status(500).json({message: 'Internal server error'});
+                res.status(500).json({ message: 'Internal server error' });
             })
 });
 
@@ -242,16 +244,24 @@ router.put('/:id/availability', jsonParser,(req, res) => {
 router.put('/:id/schedule/:week', jsonParser, (req, res) => {
     let { id, week } = req.params;
     let schedule = req.body;
-    return User.update({_id: id, 'schedule.week': week}, 
-            {$set: {'schedule.$': schedule}})
-            // {writeConcern: schedule})
-            .then(scheduleFound => {
-                console.log(`%%%%%%%%%%%%%%%%${JSON.stringify(scheduleFound.n)}`)
+    return User.update({ _id: id, 'schedule.week': week }, 
+            { $set: {'schedule.$': schedule } }
+            )
+            // `upsert` option not valid with `$` operator so we analyse the Writeconcern
+            // and push new schedule if not found
+            .then(updateResult => {
+                console.log(`%%%%%%%%%%%%%%%%${JSON.stringify(updateResult.n)}`)
+                if(updateResult.n == 0) {
+                    User.update({_id: id},
+                        { $push: { schedule: schedule } }
+                    )
+                    .catch(err => console.log(`------------- ${err}`))
+                }
                 return res.json(schedule)   
             })
             .catch(err => {
                 console.error(err);
-                res.status(500).json({message: 'Internal server error'});
+                res.status(500).json({ message: 'Internal server error' });
             })
 })
 
