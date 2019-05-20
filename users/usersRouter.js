@@ -10,6 +10,7 @@ const { defaultSchedule } = require('../utils/default_schedule')
 const cors = require('cors');
 const { User } = require('./models');
 
+
 // <--- GET --->
 
 // get all employees
@@ -34,7 +35,7 @@ router.get('/:id/availability', (req, res) => {
             .then(User => res.json(User.availability))
             .catch(err => {
                 console.log(err);
-                res.status(500).json({message: 'Internal server error'});
+                res.status(500).json({ message: 'Internal server error' });
             })
 });
 
@@ -228,7 +229,6 @@ router.put('/:id/availability', jsonParser,(req, res) => {
     console.log(req.body);
     return User.findById(req.params.id)
             .then(user => { 
-                console.log(`updating user ${user.username}'s availability`);
                 user.availability = req.body;
                 user.save()
                 .then(() => {
@@ -246,30 +246,28 @@ router.put('/:id/schedule/:week', jsonParser, (req, res) => {
     let { id, week } = req.params;
     let schedule = req.body;
     return User.update({ _id: id, 'schedule.week': week }, 
-            { $set: {'schedule.$': schedule } }
-            )
-            // `upsert` option not valid with `$` position operator so we analyse the Writeconcern
-            // and push new schedule if `week`not found
-            .then(updateResult => {
-                console.log(`%%%%%%%%%%%%%%%%${JSON.stringify(updateResult.n)}`)
-                if(updateResult.n == 0) {
-                    User.update({_id: id},
-                        // will push new schedule to the right position based on week value
-                        { $push: { 
-                            schedule: {
-                                $each: [ schedule ],
-                                $sort: { week: 1 }
-                            }
-                        } }
-                    )
-                    .catch(err => console.log(`------------- ${ err }`))
-                }
-                return res.json(schedule)   
-            })
-            .catch(err => {
-                console.error(err);
-                res.status(500).json({ message: 'Internal server error' });
-            })
+        { $set: {'schedule.$': schedule } })
+    // `upsert` option not valid with `$` position operator so we analyse the Writeconcern
+    // and push new schedule if `week`not found
+        .then(updateResult => {
+            if(updateResult.n == 0) {
+                User.update({_id: id},
+                    // will push new schedule to the right position based on week value
+                    { $push: { 
+                        schedule: {
+                            $each: [ schedule ],
+                            $sort: { week: 1 }
+                        }
+                    }}
+                )
+                .catch(err => console.log(`------------- ${ err }`))
+            }
+            return res.json(schedule)   
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ message: 'Internal server error' });
+        })
 })
 
 router.patch('/:id/info', jsonParser,(req, res) => {
@@ -319,7 +317,7 @@ router.patch('/:id/info', jsonParser,(req, res) => {
                     // user.phone_number = phone_number;
                     return user.save()
             })
-            .then((user) => {
+            .then(() => {
                 return res.json();
                 }
             )
