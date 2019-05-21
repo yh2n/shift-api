@@ -10,6 +10,7 @@ const { defaultSchedule } = require('../utils/default_schedule')
 const cors = require('cors');
 const { User } = require('./models');
 
+
 // <--- GET --->
 
 // get all employees
@@ -24,7 +25,7 @@ router.get('/employee/:id', (req, res) => {
             .then(User => res.json(User.serialize()))
             .catch(err => {
                 console.log(err);
-                res.status(500).json({message: 'Internal server error'});
+                res.status(500).json({ message: 'Internal server error' });
             })
 });
 
@@ -34,28 +35,17 @@ router.get('/:id/availability', (req, res) => {
             .then(User => res.json(User.availability))
             .catch(err => {
                 console.log(err);
-                res.status(500).json({message: 'Internal server error'});
+                res.status(500).json({ message: 'Internal server error' });
             })
 });
-
-// // get indiviual current schedule
-// router.get('/:id/schedule/:week', (req, res) => {
-//     let { id, week } = req.params;
-//     return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
-//     .then(({schedule}) => {
-//         res.json(schedule);
-//     })
-//     .catch(err => {
-//         console.log(err);  
-//         res.status(500).json({message: 'Internal server error'});
-//     })
-// });
 
 // get indiviual selected schedule or return default schedule from ../utils/default_schedule if not found
 router.get('/:id/schedule/:week', (req, res) => {
     let { id, week } = req.params;
     console.log(week)
-    return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
+    return User.findOne({_id:id},
+        { schedule: { $elemMatch: { week } } } 
+        )
         .then(({schedule}) => {
             if(schedule.length == 0) {
                 console.log("returning default schedule")
@@ -73,9 +63,6 @@ router.get('/:id/schedule/:week', (req, res) => {
         res.status(500).json({message: 'Internal server error'});
     })
 });
-
-
-
 
 // get indiviual address
 router.get('/:id/info', (req, res) => {
@@ -227,7 +214,6 @@ router.put('/:id/availability', jsonParser,(req, res) => {
     console.log(req.body);
     return User.findById(req.params.id)
             .then(user => { 
-                console.log(`updating user ${user.username}'s availability`);
                 user.availability = req.body;
                 user.save()
                 .then(() => {
@@ -237,24 +223,36 @@ router.put('/:id/availability', jsonParser,(req, res) => {
             })
             .catch(err => {
                 console.error(err);
-                res.status(500).json({message: 'Internal server error'});
+                res.status(500).json({ message: 'Internal server error' });
             })
 });
-
 
 router.put('/:id/schedule/:week', jsonParser, (req, res) => {
     let { id, week } = req.params;
     let schedule = req.body;
-    return User.update({_id: id, 'schedule.week': week}, 
-            {$set: {'schedule.$': schedule}})
-            .then(schedule => {
-                console.log(schedule)
-                return res.json(schedule)
-            })
-            .catch(err => {
-                console.error(err);
-                res.status(500).json({message: 'Internal server error'});
-            })
+    return User.update({ _id: id, 'schedule.week': week }, 
+        { $set: {'schedule.$': schedule } })
+    // `upsert` option not valid with `$` position operator so we analyse the Writeconcern
+    // and push new schedule if `week`not found
+        .then(updateResult => {
+            if(updateResult.n == 0) {
+                User.update({_id: id},
+                    // will push new schedule to the right position based on week value
+                    { $push: { 
+                        schedule: {
+                            $each: [ schedule ],
+                            $sort: { week: 1 }
+                        }
+                    }}
+                )
+                .catch(err => console.log(`------------- ${ err }`))
+            }
+            return res.json(schedule)   
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ message: 'Internal server error' });
+        })
 })
 
 router.patch('/:id/info', jsonParser,(req, res) => {
@@ -262,7 +260,7 @@ router.patch('/:id/info', jsonParser,(req, res) => {
     console.log(req.body);
     return User.findById(req.params.id)
             .then(user => { 
-                console.log(`updating ${user.username}'s info`);
+                console.log(`updating ${ user.username }'s info`);
                 const {firstName,lastName, position, phone_number, email_address, address_1, address_2, city, zip, state} = req.body;
                 //will only update submitted fields
                 if (firstName) {
@@ -304,13 +302,13 @@ router.patch('/:id/info', jsonParser,(req, res) => {
                     // user.phone_number = phone_number;
                     return user.save()
             })
-            .then((user) => {
+            .then(() => {
                 return res.json();
                 }
             )
             .catch(err => {
                 console.error(err);
-                res.status(500).json({message: 'Internal server error'});
+                res.status(500).json({ message: 'Internal server error' });
             })
 });
 
@@ -318,5 +316,4 @@ router.patch('/:id/info', jsonParser,(req, res) => {
 module.exports = { router };
 
 
-// db.update({name: 'yoh', 'schedule.week': 2}, {$set: {'schedule.$': {mon: true}}})
 
