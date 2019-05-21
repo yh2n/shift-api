@@ -38,21 +38,21 @@ router.get('/:id/availability', (req, res) => {
             })
 });
 
-// get indiviual current schedule
-router.get('/:id/schedule/:week', (req, res) => {
-    let { id, week } = req.params;
-    return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
-    .then(({schedule}) => {
-        res.json(schedule);
-    })
-    .catch(err => {
-        console.log(err);  
-        res.status(500).json({message: 'Internal server error'});
-    })
-});
+// // get indiviual current schedule
+// router.get('/:id/schedule/:week', (req, res) => {
+//     let { id, week } = req.params;
+//     return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
+//     .then(({schedule}) => {
+//         res.json(schedule);
+//     })
+//     .catch(err => {
+//         console.log(err);  
+//         res.status(500).json({message: 'Internal server error'});
+//     })
+// });
 
 // get indiviual selected schedule or return default schedule from ../utils/default_schedule if not found
-router.get('/:id/selected-schedule/:week', (req, res) => {
+router.get('/:id/schedule/:week', (req, res) => {
     let { id, week } = req.params;
     console.log(week)
     return User.findOne({_id:id},{schedule: {$elemMatch:{week}}})
