@@ -19,7 +19,7 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    emailAddress: {
+    email_address: {
         type: String,
         required: true
     },
@@ -356,7 +356,7 @@ UserSchema.methods.serialize = function() {
         username: this.username || '',
         firstName: this.firstName || '',
         lastName: this.lastName || '',
-        email_address: this.emailAddress || '',
+        email_address: this.email_address || '',
         phone_number: this.phone_number || '',
         position: this.position || '',
         availability: this.availability || '',
