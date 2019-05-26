@@ -237,7 +237,6 @@ router.put('/:id/schedule/:week', jsonParser, (req, res) => {
         .then(updateResult => {
             if(updateResult.n == 0) {
                 User.update({_id: id},
-                    // will push new schedule to the right position based on week value
                     { $push: { 
                         schedule: {
                             $each: [ schedule ],
@@ -255,62 +254,19 @@ router.put('/:id/schedule/:week', jsonParser, (req, res) => {
         })
 })
 
-router.patch('/:id/info', jsonParser,(req, res) => {
-    console.log(req.params.id);
-    console.log(req.body);
-    return User.findById(req.params.id)
-            .then(user => { 
-                console.log(`updating ${ user.username }'s info`);
-                const {firstName,lastName, position, phone_number, email_address, address_1, address_2, city, zip, state} = req.body;
-                //will only update submitted fields
-                if (firstName) {
-                    user.firstName = firstName
-                }
-                if (lastName) {
-                    user.lastName = lastName
-                }
-                if (position) {
-                    user.position = position
-                }
-                if (phone_number) {
-                    user.phone_number = phone_number
-                }
-                if (email_address) {
-                    user.email_address = email_address
-                }
-                if (phone_number) {
-                    user.phone_number = phone_number
-                }
-                if (address_1) {
-                    user.address.address_1 = address_1
-                }
-                if (address_2) {
-                    user.address.address_2 = address_2
-                }
-                if (city) {
-                    user.address.city = city
-                }
-                if (state) {
-                    user.address.state = state
-                }
-                if (zip) {
-                    user.address.zip = zip
-                }
-                //const {firstName,lastName, position, phone_number} = req.body;
-                    // user.lastName = lastName;
-                    // user.position = position;
-                    // user.phone_number = phone_number;
-                    return user.save()
-            })
-            .then(() => {
-                return res.json();
-                }
-            )
-            .catch(err => {
-                console.error(err);
-                res.status(500).json({ message: 'Internal server error' });
-            })
-});
+
+router.put('/:id/info', jsonParser,(req, res) => {
+    console.log(req.body)
+    const { id } = req.params;
+    const { employeeInfo, address } = req.body;
+    const { firstName, lastName, phone_number, email_address, position } = employeeInfo
+    
+    return User.updateOne({_id: id},
+        {$set: { firstName, lastName, position, phone_number, email_address, address }}
+        ).
+        then(user => res.json(user))
+})
+
 
 
 module.exports = { router };
