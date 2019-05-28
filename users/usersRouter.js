@@ -230,7 +230,7 @@ router.put('/:id/availability', jsonParser,(req, res) => {
 router.put('/:id/schedule/:week', jsonParser, (req, res) => {
     let { id, week } = req.params;
     let schedule = req.body;
-    return User.update({ _id: id, 'schedule.week': week }, 
+    return User.updateOne({ _id: id, 'schedule.week': week }, 
         { $set: {'schedule.$': schedule } })
     // `upsert` option not valid with `$` position operator so we analyse the Writeconcern
     // and push new schedule if `week`not found
