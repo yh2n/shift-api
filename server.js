@@ -20,9 +20,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(morgan('common'));
 
-//app.use(require("body-parser").json());
-
-
 //CORS
 app.use(
 	cors({
@@ -35,28 +32,6 @@ app.options('api/employee/:id/availability', cors());
 app.put('api/employee/:id/availability', cors(), function(req, res, next) {
 	res.json()
 });
-// app.use(function(req, res, next) {
-// 	res.header('Access-Control-Allow-Origin', '*');
-// 	res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
-// 	res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-
-// 	//intercepts OPTIONS method
-// 	if ('OPTIONS' === req.method) {
-// 		//respond with 200
-// 		res.sendStatus(200);
-// 	}
-// 	else {
-// 	//move on
-// 		next();
-// 	}
-// });
-
-// app.options("/*", function(req, res, next){
-//   res.header('Access-Control-Allow-Origin', '*');
-//   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-//   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-//   res.send(200);
-// });
 
 passport.use(jwtStrategy);
 passport.use(localStrategy);
@@ -80,13 +55,13 @@ let server;
 
 function runServer(databaseUrl = DATABASE_URL, port = PORT) {
 	return new Promise((resolve, reject) => {
-		 mongoose.connect(databaseUrl, {useNewUrlParser: true}, err => {
+		 mongoose.connect(databaseUrl, { useNewUrlParser: true }, err => {
 			if(err) {
 				return reject(err);
 			}
 
 			server = app.listen(port, () => {
-				console.log(`Server is up on port ${port} connecting to database ${databaseUrl}` );
+				console.log(`Server is up on port ${ port } connecting to database ${ databaseUrl }` );
 				resolve();
 			}).on('error', err => {
 				mongoose.disconnect();
@@ -115,6 +90,6 @@ if(require.main === module) {
 };
 
 
-module.exports = {app, runServer, closeServer};
+module.exports = { app, runServer, closeServer };
 
 
