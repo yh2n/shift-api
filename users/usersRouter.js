@@ -4,8 +4,11 @@ const router = express.Router();
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
-const urlencodedParser = bodyParser.urlencoded({ extended: true })
-const { defaultSchedule } = require('../utils/default_schedule')
+const urlencodedParser = bodyParser.urlencoded({ extended: true });
+const { defaultSchedule } = require('../utils/default_schedule');
+const faker = require('faker');
+const data = require('../utils/mock_data')
+
 
 const cors = require('cors');
 const { User } = require('./models');
@@ -28,6 +31,10 @@ router.get('/employee/:id', (req, res) => {
                 res.status(500).json({ message: 'Internal server error' });
             })
 });
+
+router.get('/mock_data', (req, res) => {
+    return res.json(data)
+})
 
 // get individual availability
 router.get('/:id/availability', (req, res) => {
