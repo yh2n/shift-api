@@ -6,7 +6,6 @@ const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
 const { defaultSchedule } = require('../utils/default_schedule');
-const faker = require('faker');
 const data = require('../utils/mock_data')
 
 
