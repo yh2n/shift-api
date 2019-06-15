@@ -261,10 +261,10 @@ router.put('/:id/info', jsonParser,(req, res) => {
     console.log(req.body)
     const { id } = req.params;
     const { employeeInfo, address } = req.body;
-    const { firstName, lastName, phone_number, email_address, position } = employeeInfo
+    const { firstName, lastName, phone_number, emailAddress, position } = employeeInfo
     
     return User.updateOne({_id: id},
-        {$set: { firstName, lastName, position, phone_number, email_address, address }}
+        {$set: { firstName, lastName, position, phone_number, emailAddress, address }}
         ).
         then(user => res.json(user))
 })

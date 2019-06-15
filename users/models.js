@@ -355,7 +355,7 @@ UserSchema.methods.serialize = function() {
         username: this.username || '',
         firstName: this.firstName || '',
         lastName: this.lastName || '',
-        email_address: this.email_address || '',
+        email_address: this.emailAddress || '',
         phone_number: this.phone_number || '',
         position: this.position || '',
         availability: this.availability || '',
