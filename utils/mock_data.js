@@ -46,10 +46,14 @@ let maitre_d = [];
 for(let i = 0; i < 1; i++) {
     maitre_d.push(info);
 }
-let captains = [];
+let barista = [];
 for(let i = 0; i < 2; i++) {
-    captains.push(info);
+    barista.push(info);
+}
+let sommelier = [];
+for(let i = 0; i < 2; i++) {
+    sommelier.push(info);
 }
 
-const data = [{ barbacks }, { bartenders}, {bussers}, {runners}, {servers}, {managers}, {hosts}, {maitre_d}, {captains}]
+const data = [{ barbacks }, { bartenders}, {bussers}, {runners}, {servers}, {managers}, {hosts}, {maitre_d}, { barista }, {sommelier}]
 module.exports = { data }

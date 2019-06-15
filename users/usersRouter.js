@@ -32,6 +32,7 @@ router.get('/employee/:id', (req, res) => {
 });
 
 router.get('/mock_data', (req, res) => {
+    console.log(data)
     return res.json(data)
 })
 
