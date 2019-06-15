@@ -6,7 +6,6 @@ const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
 const { defaultSchedule } = require('../utils/default_schedule');
-const data = require('../utils/mock_data')
 
 
 const cors = require('cors');
@@ -31,10 +30,6 @@ router.get('/employee/:id', (req, res) => {
             })
 });
 
-router.get('/mock_data', (req, res) => {
-    console.log(data)
-    return res.json(data)
-})
 
 // get individual availability
 router.get('/:id/availability', (req, res) => {
