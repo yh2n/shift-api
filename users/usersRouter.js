@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
 const { defaultSchedule } = require('../utils/default_schedule');
-
+const faker = require('faker');
 
 const cors = require('cors');
 const { User } = require('./models');
@@ -30,6 +30,18 @@ router.get('/employee/:id', (req, res) => {
             })
 });
 
+router.get('/data', (req, res) => {
+    var info = {
+        name: faker.name.findName(),
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        address: faker.address.streetAddress(),
+        city: faker.address.city(),
+        zip: faker.address.zipCode(),
+        phone: faker.phone.phoneNumberFormat()
+    }
+    return res.json(info)
+})
 
 // get individual availability
 router.get('/:id/availability', (req, res) => {
@@ -196,7 +208,7 @@ router.post('/register', jsonParser, (req, res) => {
                 password: hash,
                 firstName,
                 lastName,
-                emailAddress: email
+                email
             });
         })
         .then(user => {
@@ -237,8 +249,8 @@ router.put('/:id/schedule/:week', jsonParser, (req, res) => {
     // `upsert` option not valid with `$` position operator so we analyse the Writeconcern
     // and push new schedule if `week`not found
         .then(updateResult => {
-            if(updateResult.n == 0) {
-                User.update({_id: id},
+            if(updateResult.n === 0) {
+                User.update({ _id: id },
                     { $push: { 
                         schedule: {
                             $each: [ schedule ],
@@ -261,10 +273,10 @@ router.put('/:id/info', jsonParser,(req, res) => {
     console.log(req.body)
     const { id } = req.params;
     const { employeeInfo, address } = req.body;
-    const { firstName, lastName, phone_number, emailAddress, position } = employeeInfo
+    const { firstName, lastName, phone_number, emai, position } = employeeInfo
     
     return User.updateOne({_id: id},
-        {$set: { firstName, lastName, position, phone_number, emailAddress, address }}
+        {$set: { firstName, lastName, position, phone_number, emai, address }}
         ).
         then(user => res.json(user))
 })
