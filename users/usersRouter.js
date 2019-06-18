@@ -1,15 +1,23 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
-const passport = require('passport');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
-const urlencodedParser = bodyParser.urlencoded({ extended: true });
 const { defaultSchedule } = require('../utils/default_schedule');
 const faker = require('faker');
-
+const Pusher = require('pusher');
 const cors = require('cors');
 const { User } = require('./models');
+
+
+
+const pusher = new Pusher({
+	appId      : '805240',
+	key        : 'dd4cfaae3504bbdaa2b2',
+	secret     : '6721c324e672025e50e3',
+	cluster    : 'us2',
+	useTLS  : true,
+});
 
 
 // <--- GET --->
@@ -244,13 +252,16 @@ router.put('/:id/availability', jsonParser,(req, res) => {
 router.put('/:id/schedule/:week', jsonParser, (req, res) => {
     let { id, week } = req.params;
     let schedule = req.body;
+    pusher.trigger('update', 'availability_update', {
+        schedule
+    })
     return User.updateOne({ _id: id, 'schedule.week': week }, 
         { $set: {'schedule.$': schedule } })
     // `upsert` option not valid with `$` position operator so we analyse the Writeconcern
     // and push new schedule if `week`not found
         .then(updateResult => {
             if(updateResult.n === 0) {
-                User.update({ _id: id },
+                User.updateOne({ _id: id },
                     { $push: { 
                         schedule: {
                             $each: [ schedule ],
