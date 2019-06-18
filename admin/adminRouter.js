@@ -1,9 +1,17 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
-const passport = require('passport');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+const Pusher = require('pusher');
+
+const pusher = new Pusher({
+	appId      : '805240',
+	key        : 'dd4cfaae3504bbdaa2b2',
+	secret     : '6721c324e672025e50e3',
+	cluster    : 'us2',
+	useTLS  : true,
+  });
 
 const cors = require('cors');
 
@@ -217,6 +225,38 @@ router.post('/new_hire', jsonParser, (req, res) => {
 	res.status(201).json(newAdmin);
 	console.log("admin added to database");
 });
+
+
+router.put('/:id/schedule/:week', jsonParser, (req, res) => {
+    let { id, week } = req.params;
+    let schedule = req.body;
+            
+    // pusher.trigger('new_schedule', 'schedule_update', {
+    //     schedule
+    // })
+    return User.updateOne({ _id: id, 'schedule.week': week }, 
+        { $set: {'schedule.$': schedule } })
+    // `upsert` option not valid with `$` position operator so we analyse the Writeconcern
+    // and push new schedule if `week`not found
+        .then(updateResult => {
+            if(updateResult.n === 0) {
+                User.updateOne({ _id: id },
+                    { $push: { 
+                        schedule: {
+                            $each: [ schedule ],
+                            $sort: { week: 1 }
+                        }
+                    }}
+                )
+                .catch(err => console.log(`------------- ${ err }`))
+            }
+            return res.json(schedule)   
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ message: 'Internal server error' });
+        })
+})
 
 module.exports = { router };
 
