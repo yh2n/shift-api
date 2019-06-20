@@ -231,9 +231,9 @@ router.put('/:id/schedule/:week', jsonParser, (req, res) => {
     let { id, week } = req.params;
     let schedule = req.body;
             
-    // pusher.trigger('new_schedule', 'schedule_update', {
-    //     schedule
-    // })
+    pusher.trigger('new_schedule', 'schedule_update', {
+        schedule
+    })
     return User.updateOne({ _id: id, 'schedule.week': week }, 
         { $set: {'schedule.$': schedule } })
     // `upsert` option not valid with `$` position operator so we analyse the Writeconcern
