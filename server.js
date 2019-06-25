@@ -7,9 +7,10 @@ const passport =require('passport');
 const cors = require('cors');
 const app = express();
 const { PORT, DATABASE_URL, CLIENT_ORIGIN } = require('./config/keys');
-
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
+
+
 
 const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');

@@ -1,16 +1,23 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
-const passport = require('passport');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
-const urlencodedParser = bodyParser.urlencoded({ extended: true });
 const { defaultSchedule } = require('../utils/default_schedule');
-const data = require('../utils/mock_data')
-
-
+const faker = require('faker');
+const Pusher = require('pusher');
 const cors = require('cors');
 const { User } = require('./models');
+
+
+
+const pusher = new Pusher({
+	appId      : '805240',
+	key        : 'dd4cfaae3504bbdaa2b2',
+	secret     : '6721c324e672025e50e3',
+	cluster    : 'us2',
+	useTLS  : true,
+});
 
 
 // <--- GET --->
@@ -31,8 +38,17 @@ router.get('/employee/:id', (req, res) => {
             })
 });
 
-router.get('/mock_data', (req, res) => {
-    return res.json(data)
+router.get('/data', (req, res) => {
+    var info = {
+        name: faker.name.findName(),
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        address: faker.address.streetAddress(),
+        city: faker.address.city(),
+        zip: faker.address.zipCode(),
+        phone: faker.phone.phoneNumberFormat()
+    }
+    return res.json(info)
 })
 
 // get individual availability
@@ -200,7 +216,7 @@ router.post('/register', jsonParser, (req, res) => {
                 password: hash,
                 firstName,
                 lastName,
-                emailAddress: email
+                email
             });
         })
         .then(user => {
@@ -236,13 +252,16 @@ router.put('/:id/availability', jsonParser,(req, res) => {
 router.put('/:id/schedule/:week', jsonParser, (req, res) => {
     let { id, week } = req.params;
     let schedule = req.body;
+    pusher.trigger('update', 'availability_update', {
+        schedule
+    })
     return User.updateOne({ _id: id, 'schedule.week': week }, 
         { $set: {'schedule.$': schedule } })
     // `upsert` option not valid with `$` position operator so we analyse the Writeconcern
     // and push new schedule if `week`not found
         .then(updateResult => {
-            if(updateResult.n == 0) {
-                User.update({_id: id},
+            if(updateResult.n === 0) {
+                User.updateOne({ _id: id },
                     { $push: { 
                         schedule: {
                             $each: [ schedule ],
@@ -265,10 +284,10 @@ router.put('/:id/info', jsonParser,(req, res) => {
     console.log(req.body)
     const { id } = req.params;
     const { employeeInfo, address } = req.body;
-    const { firstName, lastName, phone_number, email_address, position } = employeeInfo
+    const { firstName, lastName, phone_number, emai, position } = employeeInfo
     
     return User.updateOne({_id: id},
-        {$set: { firstName, lastName, position, phone_number, email_address, address }}
+        {$set: { firstName, lastName, position, phone_number, emai, address }}
         ).
         then(user => res.json(user))
 })
