@@ -87,10 +87,6 @@ router.post('/register', jsonParser, (req, res) => {
 
     console.log("break 2");
 
-    // if username and password aren't trimmed we give an error.
-    //  We need to reject such values explicitly and inform user.
-    // We'll silently trim the other fields, because they aren't credentials used
-    // to log in.
     const explicityTrimmedFields = ['username', 'password'];
     const nonTrimmedField = explicityTrimmedFields.find(
         field => req.body[field].trim() !== req.body[field]
