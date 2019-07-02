@@ -31,6 +31,10 @@ const UserSchema = mongoose.Schema({
         type: String,
         default: ''
     },
+    admin: {
+        type: Boolean,
+        default: false
+    },
     availability: {
         Mo_breakfast: {
             type: Boolean,
