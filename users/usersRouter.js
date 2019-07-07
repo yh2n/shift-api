@@ -185,7 +185,6 @@ router.post('/register', jsonParser, (req, res) => {
             if (count > 0) {
                 console.log("error 5");
 
-                // There is an existing user with the same username
                 return Promise.reject({
                     code: 422,
                     reason: 'ValidationError',
@@ -193,7 +192,6 @@ router.post('/register', jsonParser, (req, res) => {
                     location: 'username'
                 });
             }
-            // If there is no existing user, hash the password
             return User.hashPassword(password);
         })
         .then(hash => {
