@@ -31,6 +31,10 @@ const UserSchema = mongoose.Schema({
         type: String,
         default: ''
     },
+    admin: {
+        type: Boolean,
+        default: false
+    },
     availability: {
         Mo_breakfast: {
             type: Boolean,
@@ -358,6 +362,7 @@ UserSchema.methods.serialize = function() {
         email: this.email || '',
         phone_number: this.phone_number || '',
         position: this.position || '',
+        admin: this.admin || '',
         availability: this.availability || '',
         schedule: this.schedule|| '',
         address: this.address || '',
