@@ -109,7 +109,6 @@ router.post('/register', jsonParser, (req, res) => {
         },
         password: {
             min: 8,
-            // bcrypt truncates after 72 characters
             max: 72
         }
     };
@@ -140,24 +139,14 @@ router.post('/register', jsonParser, (req, res) => {
     }
 
     let { username, password, firstName = '', lastName = '', email } = req.body;
-    // Username and password come in pre-trimmed, otherwise we throw an error
-    // before this
     firstName = firstName.trim();
     lastName = lastName.trim();
-  	console.log("username", username);
-  	console.log("password", password);
-  	console.log("firstName", firstName);
-  	console.log("lastName", lastName);
-  	console.log("emailAddres", email);
-
-    //console.log("Result = ", result);
     return Admin.find({ username }).count()
         .then(count => {
             console.log("check 1");
             if (count > 0) {
                 console.log("error 5");
 
-                // There is an existing Admin with the same username
                 return Promise.reject({
                     code: 422,
                     reason: 'ValidationError',
@@ -165,7 +154,6 @@ router.post('/register', jsonParser, (req, res) => {
                     location: 'username'
                 });
             }
-            // If there is no existing user, hash the password
             return Admin.hashPassword(password);
         })
         .then(hash => {
@@ -184,7 +172,6 @@ router.post('/register', jsonParser, (req, res) => {
         })
         .catch(err => {
             console.log("unexpected error!", err);
-            // Forward all errors to the client
             res.status(err.code).json(err);
         })
 });

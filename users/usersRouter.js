@@ -4,7 +4,6 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const { defaultSchedule } = require('../utils/default_schedule');
-const faker = require('faker');
 const Pusher = require('pusher');
 const cors = require('cors');
 const { User } = require('./models');
@@ -38,18 +37,6 @@ router.get('/employee/:id', (req, res) => {
             })
 });
 
-router.get('/data', (req, res) => {
-    var info = {
-        name: faker.name.findName(),
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        address: faker.address.streetAddress(),
-        city: faker.address.city(),
-        zip: faker.address.zipCode(),
-        phone: faker.phone.phoneNumberFormat()
-    }
-    return res.json(info)
-})
 
 // get individual availability
 router.get('/:id/availability', (req, res) => {
@@ -198,7 +185,6 @@ router.post('/register', jsonParser, (req, res) => {
             if (count > 0) {
                 console.log("error 5");
 
-                // There is an existing user with the same username
                 return Promise.reject({
                     code: 422,
                     reason: 'ValidationError',
@@ -206,7 +192,6 @@ router.post('/register', jsonParser, (req, res) => {
                     location: 'username'
                 });
             }
-            // If there is no existing user, hash the password
             return User.hashPassword(password);
         })
         .then(hash => {
