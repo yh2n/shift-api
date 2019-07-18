@@ -1,6 +1,7 @@
 # restaurant-schedule-app
 
 client repo: https://github.com/yh2n/shift-client
+
 live version: https://shrouded-lake-21155.herokuapp.com/
 
 ## Synopsis
