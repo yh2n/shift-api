@@ -1,7 +1,6 @@
 # restaurant-schedule-app
 
-client repo: https://github.com/yh2n/shift-client
-
+client repo: https://github.com/yh2n/shift-client<br/>
 live version: https://shrouded-lake-21155.herokuapp.com/
 
 ## Synopsis
@@ -24,6 +23,7 @@ looking for extra income...all without unnecessary emails, messages, phone calls
 ### System requirement
 
 -   Node.js
+-   Express
 -   MongoDB
 -   Passport
 -   Moment.js
